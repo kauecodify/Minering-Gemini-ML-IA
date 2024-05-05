@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minering-ML-IA</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        * {
+            text-align: center;
+            color: rgb(98, 98, 98);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+        }
+
+        #mining {
+            text-align: center;
+            margin-top: 2vh;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            opacity: 0.75; /* Opacidade de 40% */
+        }
+
+        #locais {
+            margin-top: 20px;
+        }
+
+        .local {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .local img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .avaliacao {
+            margin-top: 10px;
+        }
+
+        .mining {
+            height: 200px;
+            width: 200px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <h2>MINERING ML-IA</h2>
+    <div id="mining"><img src="mining.png" class="mining"></div>
+    
+    <div id="escolha-minerio">
+        <button id ="petroleo">Petróleo</button>
+        <button id ="outros-minerios">Outros Minérios</button>
+        <br><br>
+    </div>
+    
+    <div id="map"></div>
+
+    <div id="locais">
+    </div>
+
+    <div id="noticias">
+        <h3>Últimas Notícias</h3>
+
+        <div id="noticia1">
+            <h4>"Nova descoberta de reservas de petróleo na área de Houston."</h4>
+            <a href="https://tnpetroleo.com.br/noticia/petrobras-faz-descoberta-de-petroleo-no-golfo-do-mexico/" onclick="VerNoticia('noticia1')">Ver Notícia</a>
+            <div id="iframeNoticia1">
+                <iframe src="https://www.youtube.com/embed/?v=eMRNa-xQACU" width="100%" height="300"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div id="noticia2">
+        <h4>"Produção de gás natural no ES deve crescer 5,2% ao ano até 2028"</h4>
+        <a href="https://tnpetroleo.com.br/noticia/producao-de-gas-natural-no-es-deve-crescer-52-ao-ano-ate-2028/" onclick="VerNoticia('noticia1')">Ver Notícia</a>
+        <div id="iframeNoticia2">
+            <iframe src="https://www.youtube.com/embed/?v=eMRNa-xQACU" width="100%" height="300"></iframe>
+        </div>
+    </div>
+</div>
+
+<div id="noticia3">
+    <h4>"Veja Porque as Plataformas de Petróleo são um dos Trabalhos Mais Perigosos do Mundo"</h4>
+    <a href="https://tnpetroleo.com.br/noticia/producao-de-gas-natural-no-es-deve-crescer-52-ao-ano-ate-2028/" onclick="VerNoticia('noticia1')">Ver Notícia</a>
+    <div id="iframeNoticia3">
+        <iframe src="https://www.youtube.com/embed/?v=FrGEekFfOzM" width="100%" height="300"></iframe>
+    </div>
+</div>
+</div>
+
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var paises = [
+            { nome: 'Estados Unidos', latitude: 37.0902, longitude: -95.7129 },
+            { nome: 'China', latitude: 35.8617, longitude: 104.1954 },
+            { nome: 'Índia', latitude: 20.5937, longitude: 78.9629 },
+            { nome: 'Austrália', latitude: -25.2744, longitude: 133.7751 },
+            { nome: 'Canadá', latitude: 56.1304, longitude: -106.3468 },
+            { nome: 'Brasil', latitude: -14.2350, longitude: -51.9253 },
+            { nome: 'África do Sul', latitude: -30.5595, longitude: 22.9375 }
+        ];
+
+        var pontosExtracaoPetroleo = [
+            { latitude: 29.7604, longitude: -95.3698, noticias: "Nova descoberta de reservas de petróleo na área de Houston." },
+            { latitude: -22.9083, longitude: -43.1971, noticias: "Investimentos em expansão da produção de petróleo na Bacia de Campos." },
+            { latitude: 28.6139, longitude: 77.209, noticias: "Produção recorde de petróleo registrado nos campos de Rajasthan, na Índia." },
+            { latitude: -3.1064, longitude: -60.0264, noticias: "Descoberta de novas reservas de petróleo na Bacia do Amazonas, Brasil." },
+            { latitude: 32.7767, longitude: -96.797, noticias: "Aumento nos investimentos em exploração de petróleo em Dallas, EUA." },
+            { latitude: 51.5074, longitude: -0.1278, noticias: "Projetos de perfuração offshore em andamento no Mar do Norte, Reino Unido." },
+            { latitude: 59.3293, longitude: 18.0686, noticias: "Modernização das instalações de extração de petróleo em Estocolmo, Suécia." },
+            { latitude: 22.3193, longitude: 114.1694, noticias: "Expansão das operações de extração de petróleo em Hong Kong." },
+            { latitude: 31.2304, longitude: 121.4737, noticias: "Avanços tecnológicos impulsionam a produção de petróleo em Xangai, China." },
+            { latitude: 55.7558, longitude: 37.6176, noticias: "Aumento da produção de petróleo nos campos de Moscou, Rússia." }
+        ];
+
+        paises.forEach(function(pais) {
+            var marker = L.marker([pais.latitude, pais.longitude]).addTo(map);
+            marker.bindPopup(pais.nome);
+        });
+
+        pontosExtracaoPetroleo.forEach(function(ponto) {
+            var marker = L.marker([ponto.latitude, ponto.longitude], {
+                icon: L.divIcon({
+                    className: 'custom-icon',
+                    html: '<div style="background-color: yellow; width: 25px; height: 25px; border-radius: 45%;"></div>'
+                })
+            }).addTo(map);
+            marker.bindPopup('Ponto de extração de petróleo');
+        });
+
+        function mostrarNoticia(id) {
+            var iframe = document.getElementById(id);
+            if (iframe.style.display === "none") {
+                iframe.style.display = "block";
+            } else {
+                iframe.style.display = "none";
+            }
+        }
+
+        document.querySelector('input[name="minerio"]').addEventListener('change', function() {
+    var escolha = document.querySelector('input[name="minerio"]:checked').value;
+
+    map.eachLayer(function(layer) {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+
+    if (escolha === 'petroleo') {
+        pontosExtracaoPetroleo.forEach(function(ponto) {
+            var marker = L.marker([ponto.latitude, ponto.longitude], {
+                icon: L.divIcon({
+                    className: 'custom-icon',
+                    html: '<div style="background-color: yellow; width: 25px; height: 25px; border-radius: 45%;"></div>'
+                })
+            }).addTo(map);
+            marker.bindPopup('Ponto de extração de petróleo');
+        });
+    } else if (escolha === 'outros-minerios') {
+      
+        console.log("Exibir pontos de extração de outros minérios");
+    }
+});
+    </script>
+</body>
+</html>
